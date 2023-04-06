@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -37,6 +35,10 @@ allprojects {
 
 subprojects {
     group = "com.kl.demostep"
+
+    dependencies {
+        project(":common")
+    }
 }
 
 dependencies {
