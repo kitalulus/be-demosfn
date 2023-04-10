@@ -1,14 +1,17 @@
 package com.kl.demostep.order.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class TravelOrderRequest (
-    val name: String,
-    val dateFrom: String,
-    val dateTo: String,
-    val bookingFlightId: String,
-    val bookingHotelId: String,
+    val orderId: String,
+    val flightSelectionId: String,
+    val hotelSelectionId: String,
 )
 
+@Serializable
 data class TravelOrderResponse (
     val success: Boolean,
     val message: String,
+    val requestName: String,
 )
