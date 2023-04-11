@@ -38,6 +38,6 @@ class OrderController(
         return TravelOrderResponse(true, "Order created", theReq.name)
     }
 
-    @GetMapping
-    fun getOrder(): String = "hello there yowdy"
+    @GetMapping(produces = ["text/plain"])
+    fun getOrder(): String = "Order Service"
 }
