@@ -6,6 +6,8 @@ import com.kl.demostep.common.model.SfnOrderRequest
 import com.kl.demostep.order.config.OrderAppConfig
 import com.kl.demostep.order.model.TravelOrderRequest
 import com.kl.demostep.order.model.TravelOrderResponse
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -30,7 +32,7 @@ class OrderController(
         val theReq = StartExecutionRequest()
             .withName(name)
             .withStateMachineArn(orderAppConfig.sfnNewOrderArn)
-            .withInput(sfnOrderRequest.toString())
+            .withInput(Json.encodeToString(sfnOrderRequest))
         val response = sfnClient.startExecution(theReq)
 
         return TravelOrderResponse(true, "Order created", theReq.name)

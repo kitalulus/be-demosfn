@@ -9,9 +9,12 @@ import com.kl.demostep.common.model.CancelFlightRequest
 import com.kl.demostep.common.model.SendPlaneTicketRequest
 import com.kl.demostep.common.utils.logger
 import com.kl.demostep.common.utils.parseJsonFromStringEither
+import com.kl.demostep.common.utils.toJsonString
 import com.kl.demostep.flight.config.FlightAppConfig
 import io.awspring.cloud.messaging.listener.SqsMessageDeletionPolicy
 import io.awspring.cloud.messaging.listener.annotation.SqsListener
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 
 @Service
@@ -39,7 +42,7 @@ class FlightQueue(
             )
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
-                .withOutput(successRequestOutput.toString())
+                .withOutput(Json.encodeToString(successRequestOutput))
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)
@@ -67,6 +70,7 @@ class FlightQueue(
         if (cancelFlightSuccess) {
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
+                .withOutput("CancelFlightSuccess".toJsonString())
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)
@@ -94,6 +98,7 @@ class FlightQueue(
         if (sendTicketSuccess) {
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
+                .withOutput("SendPlaneTicketSuccess".toJsonString())
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)

@@ -6,9 +6,12 @@ import com.amazonaws.services.stepfunctions.model.SendTaskSuccessRequest
 import com.kl.demostep.common.model.*
 import com.kl.demostep.common.utils.logger
 import com.kl.demostep.common.utils.parseJsonFromStringEither
+import com.kl.demostep.common.utils.toJsonString
 import com.kl.demostep.payment.config.PaymentAppConfig
 import io.awspring.cloud.messaging.listener.SqsMessageDeletionPolicy
 import io.awspring.cloud.messaging.listener.annotation.SqsListener
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,7 +39,7 @@ class PaymentQueue(
             )
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
-                .withOutput(successRequestOutput.toString())
+                .withOutput(Json.encodeToString(successRequestOutput))
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)
@@ -63,7 +66,7 @@ class PaymentQueue(
         if (settlePaymentSuccess) {
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
-                .withOutput("SettlePaymentSuccess")
+                .withOutput("SettlePaymentSuccess".toJsonString())
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)
@@ -90,7 +93,7 @@ class PaymentQueue(
         if (cancelPaymentSuccess) {
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
-                .withOutput("CancelPaymentSuccess")
+                .withOutput("CancelPaymentSuccess".toJsonString())
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)
@@ -117,7 +120,7 @@ class PaymentQueue(
         if (sendInvoiceSuccess) {
             val sendTaskRequest = SendTaskSuccessRequest()
                 .withTaskToken(request.taskToken)
-                .withOutput("SendInvoiceSuccess")
+                .withOutput("SendInvoiceSuccess".toJsonString())
             sfnClient.sendTaskSuccess(sendTaskRequest)
                 .also {
                     assert(it.sdkHttpMetadata.httpStatusCode == 200)

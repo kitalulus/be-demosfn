@@ -7,5 +7,6 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConfigurationProperties(prefix = "application.hotel")
 data class HotelAppConfig(
     val queueBookHotel: String,
+    val queueCancelBook: String,
     val queueSendHotelConfirmation: String,
 )
