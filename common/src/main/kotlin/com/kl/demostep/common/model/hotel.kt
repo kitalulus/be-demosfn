@@ -19,3 +19,9 @@ data class CancelHotelRequest(
     val bookedHotelId: String,
     val taskToken: String,
 )
+
+@Serializable
+data class SendHotelConfirmationRequest(
+    val bookedHotelId: String,
+    val taskToken: String,
+)

@@ -22,7 +22,6 @@ data class CancelFlightRequest(
 
 @Serializable
 data class SendPlaneTicketRequest(
-    val orderId: String,
     val bookedFlightId: String,
     val taskToken: String,
 )

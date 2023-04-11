@@ -5,6 +5,8 @@ import com.amazonaws.services.stepfunctions.model.SendTaskFailureRequest
 import com.amazonaws.services.stepfunctions.model.SendTaskSuccessRequest
 import com.kl.demostep.common.model.BookHotelRequest
 import com.kl.demostep.common.model.BookHotelResponse
+import com.kl.demostep.common.model.CancelHotelRequest
+import com.kl.demostep.common.model.SendHotelConfirmationRequest
 import com.kl.demostep.common.utils.logger
 import com.kl.demostep.common.utils.parseJsonFromStringEither
 import com.kl.demostep.common.utils.toJsonString
@@ -62,7 +64,7 @@ class HotelQueue(
         deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS,
     )
     fun cancelBook(msg: String) {
-        val request = parseJsonFromStringEither<BookHotelRequest>(msg)
+        val request = parseJsonFromStringEither<CancelHotelRequest>(msg)
         log.info("cancelBook: $request")
 
         if (cancelBookSuccess) {
@@ -90,7 +92,7 @@ class HotelQueue(
         deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS,
     )
     fun sendConfirmation(msg: String) {
-        val request = parseJsonFromStringEither<BookHotelRequest>(msg)
+        val request = parseJsonFromStringEither<SendHotelConfirmationRequest>(msg)
         log.info("sendConfirmation: $request")
 
         if (sendConfirmationSuccess) {
