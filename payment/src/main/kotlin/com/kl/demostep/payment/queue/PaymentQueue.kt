@@ -1,7 +1,9 @@
 package com.kl.demostep.payment.queue
 
 import com.amazonaws.services.stepfunctions.AWSStepFunctions
-import com.kl.demostep.common.model.HoldPaymentRequest
+import com.amazonaws.services.stepfunctions.model.SendTaskFailureRequest
+import com.amazonaws.services.stepfunctions.model.SendTaskSuccessRequest
+import com.kl.demostep.common.model.*
 import com.kl.demostep.common.utils.logger
 import com.kl.demostep.common.utils.parseJsonFromStringEither
 import com.kl.demostep.payment.config.PaymentAppConfig
@@ -16,6 +18,11 @@ class PaymentQueue(
 ) {
     val log = logger()
 
+    private val holdPaymentSuccess = true
+    private val settlePaymentSuccess = true
+    private val cancelPaymentSuccess = true
+    private val sendInvoiceSuccess = true
+
     @SqsListener(
         value = ["#{paymentQueue.paymentAppConfig.queueHoldPayment}"],
         deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS,
@@ -23,7 +30,27 @@ class PaymentQueue(
     fun holdPayment(msg: String) {
         val request = parseJsonFromStringEither<HoldPaymentRequest>(msg)
         log.info("holdPayment: $request")
-
+        if (holdPaymentSuccess) {
+            val successRequestOutput = HoldPaymentResponse(
+                paymentId = "PAYMENT-${request.orderId}",
+            )
+            val sendTaskRequest = SendTaskSuccessRequest()
+                .withTaskToken(request.taskToken)
+                .withOutput(successRequestOutput.toString())
+            sfnClient.sendTaskSuccess(sendTaskRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        } else {
+            val sendTaskFailureRequest = SendTaskFailureRequest()
+                .withTaskToken(request.taskToken)
+                .withCause("Payment failed")
+                .withError("PaymentFailed")
+            sfnClient.sendTaskFailure(sendTaskFailureRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        }
     }
 
     @SqsListener(
@@ -31,7 +58,26 @@ class PaymentQueue(
         deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS,
     )
     fun settlePayment(msg: String) {
-        log.info("settlePayment")
+        val request = parseJsonFromStringEither<SettlePaymentRequest>(msg)
+        log.info("settlePayment: $request")
+        if (settlePaymentSuccess) {
+            val sendTaskRequest = SendTaskSuccessRequest()
+                .withTaskToken(request.taskToken)
+                .withOutput("SettlePaymentSuccess")
+            sfnClient.sendTaskSuccess(sendTaskRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        } else {
+            val sendTaskFailureRequest = SendTaskFailureRequest()
+                .withTaskToken(request.taskToken)
+                .withCause("Settle payment failed")
+                .withError("SettleFailed")
+            sfnClient.sendTaskFailure(sendTaskFailureRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        }
     }
 
     @SqsListener(
@@ -39,7 +85,26 @@ class PaymentQueue(
         deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS,
     )
     fun cancelPayment(msg: String) {
-        log.info("cancelPayment")
+        val request = parseJsonFromStringEither<ReleaseHoldRequest>(msg)
+        log.info("cancelPayment: $request")
+        if (cancelPaymentSuccess) {
+            val sendTaskRequest = SendTaskSuccessRequest()
+                .withTaskToken(request.taskToken)
+                .withOutput("CancelPaymentSuccess")
+            sfnClient.sendTaskSuccess(sendTaskRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        } else {
+            val sendTaskFailureRequest = SendTaskFailureRequest()
+                .withTaskToken(request.taskToken)
+                .withCause("Cancel payment failed")
+                .withError("CancelFailed")
+            sfnClient.sendTaskFailure(sendTaskFailureRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        }
     }
 
     @SqsListener(
@@ -47,6 +112,25 @@ class PaymentQueue(
         deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS,
     )
     fun sendInvoice(msg: String) {
-        log.info("sendInvoice")
+        val request = parseJsonFromStringEither<SendInvoiceRequest>(msg)
+        log.info("sendInvoice: $request")
+        if (sendInvoiceSuccess) {
+            val sendTaskRequest = SendTaskSuccessRequest()
+                .withTaskToken(request.taskToken)
+                .withOutput("SendInvoiceSuccess")
+            sfnClient.sendTaskSuccess(sendTaskRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        } else {
+            val sendTaskFailureRequest = SendTaskFailureRequest()
+                .withTaskToken(request.taskToken)
+                .withCause("Send invoice failed")
+                .withError("SendInvoiceFailed")
+            sfnClient.sendTaskFailure(sendTaskFailureRequest)
+                .also {
+                    assert(it.sdkHttpMetadata.httpStatusCode == 200)
+                }
+        }
     }
 }
