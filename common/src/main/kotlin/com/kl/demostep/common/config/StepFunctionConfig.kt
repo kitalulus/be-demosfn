@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Configuration
 class StepFunctionConfig {
     val log = logger()
 
+    @Value("\${cloud.aws.region.static}")
+    private lateinit var region: String
+
     @Value("\${cloud.aws.credentials.access-key}")
     private lateinit var accessKey: String
 
@@ -25,6 +28,7 @@ class StepFunctionConfig {
         val credential = BasicAWSCredentials(accessKey, secretKey)
         return AWSStepFunctionsClientBuilder
             .standard()
+            .withRegion(region)
             .withCredentials(AWSStaticCredentialsProvider(credential))
             .build()
     }
