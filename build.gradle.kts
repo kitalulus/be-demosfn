@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.8.21"
     id("io.spring.dependency-management") version "1.0.15.RELEASE" apply false
     id("org.springframework.boot") version "2.7.10" apply false
-    kotlin("plugin.spring") version "1.8.20" apply false
-    kotlin("plugin.jpa") version "1.8.20" apply false
-    kotlin("plugin.serialization") version "1.8.20" apply false
+    kotlin("plugin.spring") version "1.8.21" apply false
+    kotlin("plugin.jpa") version "1.8.21" apply false
+    kotlin("plugin.serialization") version "1.8.21" apply false
 }
 
 group = "com.kl"
@@ -48,6 +48,7 @@ subprojects {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.test {
@@ -56,4 +57,7 @@ tasks.test {
 
 kotlin {
     jvmToolchain(17)
+}
+repositories {
+    mavenCentral()
 }
